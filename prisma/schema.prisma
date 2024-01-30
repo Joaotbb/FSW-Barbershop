@@ -37,6 +37,7 @@ model Service {
   bookings     Booking[]
 }
 
+
 model Booking {
   id           String     @id @default(uuid())
   barbershopId String
@@ -47,5 +48,3 @@ model Booking {
   user         User       @relation(fields: [userId], references: [id])
   date         DateTime   @db.Timestamp
 }
-
-
