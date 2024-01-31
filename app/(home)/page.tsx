@@ -5,6 +5,7 @@ import Search from "./_components/search";
 import BookingItem from "../_components/booking-item";
 import BarbershopItem from "./_components/barbershop-item";
 import { db } from "../_lib/prisma";
+import { Barbershop } from "@prisma/client";
 
 export default async function Home() {
   // chamar prisma e pegar barbearias
@@ -39,7 +40,7 @@ export default async function Home() {
         </h2>
 
         <div className="flex px-5 gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {barbershops.map((barbershop) => (
+          {barbershops.map((barbershop: Barbershop) => (
             <BarbershopItem key={barbershop.id} barbershop={barbershop} />
           ))}
         </div>
