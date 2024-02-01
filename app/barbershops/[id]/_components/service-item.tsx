@@ -40,9 +40,9 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
 
             <div className="flex items-center justify-between mt-3">
               <p className="text-primary text-sm font-bold">
-                {Intl.NumberFormat("pt-BR", {
+                {Intl.NumberFormat("pt", {
                   style: "currency",
-                  currency: "BRL",
+                  currency: "EUR",
                 }).format(Number(service.price))}
               </p>
               <Button variant="secondary" onClick={handleBookingClick}>
