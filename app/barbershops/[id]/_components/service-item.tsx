@@ -73,6 +73,7 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                   <Calendar
                       mode="single"
                       selected={date}
+                      onSelect={setDate}
                       // prevent from schedule on days that have gone
                       fromDate={new Date()}
                       styles={{
