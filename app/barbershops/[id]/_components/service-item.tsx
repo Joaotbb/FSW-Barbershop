@@ -11,10 +11,10 @@ import {
   SheetTrigger,
 } from "@/app/_components/ui/sheet";
 import { Service } from "@prisma/client";
-import {} from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { generateDayTimeList } from "../_helpers/hours";
 
 interface ServiceItemProps {
   service: Service;
@@ -31,6 +31,11 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
 
     // TODO: abrir modal de agendamento
   };
+
+  const timeList = useMemo(() => {
+    
+      return date ? generateDayTimeList(date): [];
+    },[date]);
 
   return (
     <Card>
@@ -69,8 +74,9 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                     <SheetTitle>Fazer Reserva</SheetTitle>
                   </SheetHeader>
 
+                  {/* Calendar */}
                   <div className="py-8">
-                  <Calendar
+                    <Calendar
                       mode="single"
                       selected={date}
                       onSelect={setDate}
@@ -102,6 +108,22 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                     />
                   </div>
 
+
+                  {date && (
+                    <div className="flex gap-3 overflow-x-auto py-6 px-5 border-t border-solid border-secondary [&::-webkit-scrollbar]:hidden">
+                      {timeList.map((time) => (
+                        <Button
+                          // onClick={() => handleHourClick(time)}
+                          // variant={hour === time ? "default" : "outline"}
+                          
+                          className="rounded-full"
+                          key={time}
+                        >
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </SheetContent>
               </Sheet>
             </div>
