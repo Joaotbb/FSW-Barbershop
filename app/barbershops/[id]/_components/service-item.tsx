@@ -12,12 +12,15 @@ import {
   SheetTrigger,
 } from "@/app/_components/ui/sheet";
 import { Barbershop, Service } from "@prisma/client";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { pt } from "date-fns/locale";
+import { pt, ptBR } from "date-fns/locale";
 import { format, setHours, setMinutes } from "date-fns";
 import { generateDayTimeList } from "../_helpers/hours";
+import { saveBooking } from "../_actions/save-bookings";
+import { toast } from "@/app/_components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface ServiceItemProps {
   barbershop: Barbershop;
@@ -30,12 +33,17 @@ const ServiceItem = ({
   barbershop,
   isAuthenticated,
 }: ServiceItemProps) => {
+
+  const { data } = useSession();
+  
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
+  const [submitIsLoading, setSubmitIsLoading] = useState(false);
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
   const handleBookingClick = () => {
     if (!isAuthenticated) {
-      return signIn("google");
+      // return signIn("google");
     }
 
     // TODO: abrir modal de agendamento
@@ -47,9 +55,43 @@ const ServiceItem = ({
     setHour(undefined);
   };
 
+  // Function to set the the hour after click
   const handleHourClick = (time: string) => {
     setHour(time);
   };
+
+
+  const handleBookingSubmit = async () => {
+    setSubmitIsLoading(true);
+
+    try {
+      if (!hour || !date || !data?.user) {
+        return;
+      }
+
+      const dateHour = Number(hour.split(":")[0]);
+      const dateMinutes = Number(hour.split(":")[1]);
+
+      const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
+
+      await saveBooking({
+        serviceId: service.id,
+        barbershopId: barbershop.id,
+        date: newDate,
+        userId: (data.user as any).id,
+      });
+
+      setSheetIsOpen(false);
+      setHour(undefined);
+      setDate(undefined);
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitIsLoading(false);
+    }
+  };
+
 
   const timeList = useMemo(() => {
     return date ? generateDayTimeList(date) : [];
@@ -184,7 +226,10 @@ const ServiceItem = ({
                   </div>
 
                   <SheetFooter className="px-5">
-                    <Button disabled={!hour || !date}>Confirmar reserva</Button>
+                  <Button onClick={handleBookingSubmit} disabled={!hour || !date || submitIsLoading}>
+                      {submitIsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Confirmar reserva
+                    </Button>
                   </SheetFooter>
                 </SheetContent>
               </Sheet>
