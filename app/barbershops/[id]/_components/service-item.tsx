@@ -14,13 +14,14 @@ import {
 import { Barbershop, Service } from "@prisma/client";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { pt, ptBR } from "date-fns/locale";
 import { format, setHours, setMinutes } from "date-fns";
 import { generateDayTimeList } from "../_helpers/hours";
 import { saveBooking } from "../_actions/save-bookings";
-import { toast } from "@/app/_components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ServiceItemProps {
   barbershop: Barbershop;
@@ -33,9 +34,9 @@ const ServiceItem = ({
   barbershop,
   isAuthenticated,
 }: ServiceItemProps) => {
-
+  const router = useRouter();
   const { data } = useSession();
-  
+
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<string | undefined>();
   const [submitIsLoading, setSubmitIsLoading] = useState(false);
@@ -60,7 +61,6 @@ const ServiceItem = ({
     setHour(time);
   };
 
-
   const handleBookingSubmit = async () => {
     setSubmitIsLoading(true);
 
@@ -80,18 +80,25 @@ const ServiceItem = ({
         date: newDate,
         userId: (data.user as any).id,
       });
-
       setSheetIsOpen(false);
       setHour(undefined);
       setDate(undefined);
 
+      toast("Reserva realizada com sucesso!", {
+        description: format(newDate, "'Para' dd 'de' MMMM 'às' HH':'mm'.'", {
+          locale: ptBR,
+        }),
+        action: {
+          label: "Visualizar",
+          onClick: () => router.push("/bookings"),
+        },
+      });
     } catch (error) {
       console.error(error);
     } finally {
       setSubmitIsLoading(false);
     }
   };
-
 
   const timeList = useMemo(() => {
     return date ? generateDayTimeList(date) : [];
@@ -122,7 +129,8 @@ const ServiceItem = ({
                   currency: "EUR",
                 }).format(Number(service.price))}
               </p>
-              <Sheet>
+
+              <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
                 <SheetTrigger asChild>
                   <Button variant="secondary" onClick={handleBookingClick}>
                     Reservar
@@ -225,9 +233,15 @@ const ServiceItem = ({
                     </Card>
                   </div>
 
+                  {/* Confirme booking button */}
                   <SheetFooter className="px-5">
-                  <Button onClick={handleBookingSubmit} disabled={!hour || !date || submitIsLoading}>
-                      {submitIsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button
+                      onClick={handleBookingSubmit}
+                      disabled={!hour || !date || submitIsLoading}
+                    >
+                      {submitIsLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       Confirmar reserva
                     </Button>
                   </SheetFooter>
