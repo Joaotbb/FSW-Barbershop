@@ -68,7 +68,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={booking.barbershop.imageUrl} />
 
-                  <AvatarFallback>A</AvatarFallback>
+                  <AvatarFallback></AvatarFallback>
                 </Avatar>
 
                 <h3 className="text-sm">{booking.barbershop.name}</h3>
@@ -95,7 +95,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
 
         <div className="px-5">
           <div className="relative h-[180px] w-full mt-6">
-            <Image src="/barbershop-map.png" fill alt={booking.barbershop.name} />
+          <Image src="/barbershop-map.png" fill alt={booking.barbershop.name} />
 
             <div className="w-full absolute bottom-4 left-0 px-5">
               <Card>
@@ -180,6 +180,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
           </SheetFooter>
         </div>
       </SheetContent>
