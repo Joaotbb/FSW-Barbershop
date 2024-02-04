@@ -120,7 +120,6 @@ const ServiceItem = ({
     if (!date) {
       return [];
     }
-
     return generateDayTimeList(date).filter((time) => {
       const timeHour = Number(time.split(":")[0]);
       const timeMinutes = Number(time.split(":")[1]);
